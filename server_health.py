@@ -6,23 +6,34 @@ cpu = psutil.cpu_percent(interval=1)
 memory = psutil.virtual_memory().percent
 disk = psutil.disk_usage("C:\\").percent
 
+resources = {
+    "CPU": cpu,
+    "Memory": memory,
+    "Disk": disk
+}
+
+
 def check_status(value):
-    if value >= 80:
+    if value >= 90:
+        return "CRITICAL"
+    elif 80 <= value < 90:
         return "WARNING"
     else:
         return "OK"
 
-cpu_status = check_status(cpu)
-memory_status = check_status(memory)
-disk_status = check_status(disk)
+
+resource_status = [check_status(value) for value in resources.values()]
 
 
-print(f"CPU Usage: {cpu}% - {cpu_status}")
-print(f"Memory Usage: {memory}% - {memory_status}")
-print(f"Disk Usage: {disk}% - {disk_status}")
+for name, value in resources.items():
+    print(f"{name}: {value:.1f}% {check_status(value)}")
+    
 
-if cpu_status=="WARNING" or memory_status=="WARNING" or disk_status=="WARNING":
-    print("Overall Status: WARNING")
+
+if "CRITICAL" in resource_status:
+    print("Overall Status: CRITICAL")
+elif "WARNING" in resource_status:
+    print ("Overall Status: WARNING")
 else:
     print("Overall Status: OK")
 
